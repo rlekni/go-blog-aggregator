@@ -64,3 +64,18 @@ func handlerDeleteAll(s *state, cmd command) error {
 
 	return nil
 }
+
+func handlerGetAllUsers(s *state, cmd command) error {
+	users, err := s.db.GetAllUsers(context.Background())
+	if err != nil {
+		return fmt.Errorf("Failed to delete users: %w", err)
+	}
+	for _, user := range users {
+		if user.Name == s.cfg.Username {
+			fmt.Printf("* %s (current)\n", user.Name)
+		} else {
+			fmt.Printf("* %s\n", user.Name)
+		}
+	}
+	return nil
+}
