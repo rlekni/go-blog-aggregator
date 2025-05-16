@@ -50,7 +50,7 @@ func (q *Queries) CreateUser(ctx context.Context, arg CreateUserParams) (User, e
 const getUser = `-- name: GetUser :one
 SELECT id, created_at, updated_at, name
 FROM users
-WHERE id = $1
+WHERE name = $1
 `
 
 type GetUserRow struct {
@@ -60,8 +60,8 @@ type GetUserRow struct {
 	Name      string
 }
 
-func (q *Queries) GetUser(ctx context.Context, id uuid.UUID) (GetUserRow, error) {
-	row := q.db.QueryRowContext(ctx, getUser, id)
+func (q *Queries) GetUser(ctx context.Context, name string) (GetUserRow, error) {
+	row := q.db.QueryRowContext(ctx, getUser, name)
 	var i GetUserRow
 	err := row.Scan(
 		&i.ID,
