@@ -2,7 +2,6 @@ package main
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"os"
 
@@ -22,7 +21,7 @@ func main() {
 		log.Fatalf("error reading config: %v", err)
 	}
 
-	fmt.Printf("db url: %+v\n", cfg)
+	// fmt.Printf("db url: %+v\n", cfg)
 	db, err := sql.Open("postgres", cfg.DbUrl)
 	if err != nil {
 		log.Fatalf("failed to open database connection: %v", err)
@@ -41,6 +40,8 @@ func main() {
 	cmds.register("reset", handlerDeleteAll)
 	cmds.register("users", handlerGetAllUsers)
 	cmds.register("agg", handlerAggregate)
+	cmds.register("addfeed", handlerAddFeed)
+	cmds.register("feeds", handlerGetAllFeeds)
 
 	if len(os.Args) < 2 {
 		log.Fatal("Usage: cli <command> [args...]")

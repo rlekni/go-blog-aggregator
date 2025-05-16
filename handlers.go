@@ -88,3 +88,42 @@ func handlerAggregate(s *state, cmd command) error {
 	fmt.Printf("Feed: %+v\n", feed)
 	return nil
 }
+
+func handlerAddFeed(s *state, cmd command) error {
+	if len(cmd.Args) != 2 {
+		return fmt.Errorf("usage: %s <name>", cmd.Name)
+	}
+	name := cmd.Args[0]
+	url := cmd.Args[1]
+	user, err := s.db.GetUser(context.Background(), s.cfg.Username)
+	if err != nil {
+		return fmt.Errorf("user does not exist: %w", err)
+	}
+	fmt.Printf("user found: %+v\n", user)
+
+	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
+		ID:        uuid.New(),
+		CreatedAt: time.Now().UTC(),
+		UpdatedAt: time.Now().UTC(),
+		Name:      name,
+		Url:       url,
+		UserID:    user.ID,
+	})
+	if err != nil {
+		return fmt.Errorf("failed creating feed: %w", err)
+	}
+	fmt.Printf("feed created: %+v\n", feed)
+
+	return nil
+}
+
+func handlerGetAllFeeds(s *state, cmd command) error {
+	feeds, err := s.db.GetAllFeeds(context.Background())
+	if err != nil {
+		return fmt.Errorf("Failed to get feeds: %w", err)
+	}
+	for _, feed := range feeds {
+		fmt.Printf("%+v\n", feed)
+	}
+	return nil
+}
