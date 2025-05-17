@@ -89,17 +89,12 @@ func handlerAggregate(s *state, cmd command) error {
 	return nil
 }
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) != 2 {
 		return fmt.Errorf("usage: %s <name>", cmd.Name)
 	}
 	name := cmd.Args[0]
 	url := cmd.Args[1]
-	user, err := s.db.GetUser(context.Background(), s.cfg.Username)
-	if err != nil {
-		return fmt.Errorf("user does not exist: %w", err)
-	}
-	fmt.Printf("user found: %+v\n", user)
 
 	feed, err := s.db.CreateFeed(context.Background(), database.CreateFeedParams{
 		ID:        uuid.New(),
@@ -139,17 +134,11 @@ func handlerGetAllFeeds(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.Args) != 1 {
 		return fmt.Errorf("usage: %s <name>", cmd.Name)
 	}
 	url := cmd.Args[0]
-
-	user, err := s.db.GetUser(context.Background(), s.cfg.Username)
-	if err != nil {
-		return fmt.Errorf("user does not exist: %w", err)
-	}
-	fmt.Printf("user found: %+v\n", user)
 
 	feed, err := s.db.GetFeedByURL(context.Background(), url)
 	if err != nil {
@@ -170,13 +159,7 @@ func handlerFollow(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollowing(s *state, cmd command) error {
-	user, err := s.db.GetUser(context.Background(), s.cfg.Username)
-	if err != nil {
-		return fmt.Errorf("user does not exist: %w", err)
-	}
-	fmt.Printf("user found: %+v\n", user)
-
+func handlerFollowing(s *state, cmd command, user database.User) error {
 	follows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
 		return fmt.Errorf("Failed to get followed feeds: %w", err)
