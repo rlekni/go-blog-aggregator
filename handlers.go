@@ -159,6 +159,27 @@ func handlerFollow(s *state, cmd command, user database.User) error {
 	return nil
 }
 
+func handlerUnfollow(s *state, cmd command, user database.User) error {
+	if len(cmd.Args) != 1 {
+		return fmt.Errorf("usage: %s <name>", cmd.Name)
+	}
+	url := cmd.Args[0]
+	feed, err := s.db.GetFeedByURL(context.Background(), url)
+	if err != nil {
+		return fmt.Errorf("failed fetching feed: %w", err)
+	}
+
+	err = s.db.DeleteFollowForFeedAndUser(context.Background(), database.DeleteFollowForFeedAndUserParams{
+		UserID: user.ID,
+		FeedID: feed.ID,
+	})
+	err = s.db.DeleteAllFollows(context.Background())
+	if err != nil {
+		return fmt.Errorf("failed deleting feed follow: %w", err)
+	}
+	return nil
+}
+
 func handlerFollowing(s *state, cmd command, user database.User) error {
 	follows, err := s.db.GetFeedFollowsForUser(context.Background(), user.ID)
 	if err != nil {
